@@ -23,6 +23,6 @@
     "lodash": "^4.17",
     "request": "^2.75.0",
     "webdriverio": "^4.6.2",
-    "webpolis-chromeless": "^1.4.0",
+    "webpolis-chromeless": "^1.4.0"
   }
 }
