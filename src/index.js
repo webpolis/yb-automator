@@ -2,7 +2,7 @@ const Graph = require('gonitely-graph');
 const Promise = require('bluebird');
 const debug = require('debug');
 const _ = require('lodash');
-const Chromeless = require('webpolis-chromeless').default;
+const YbChromeless = require('yb-chromeless').default;
 const request = require('request');
 const webdriverio = require('webdriverio');
 const base64img = require('base64-img');
@@ -69,7 +69,7 @@ module.exports = class automator {
     });
   }
 
-  startChromelessSession() {
+  startYbChromelessSession() {
     return new Promise((_resolve, _reject) => {
       // call browser broker
       request({
@@ -88,7 +88,7 @@ module.exports = class automator {
 
           log('[session]' + JSON.stringify(session));
 
-          this.browser = new Chromeless({
+          this.browser = new YbChromeless({
             debug: true,
             implicitWait: true,
             scrollBeforeClick: true,
@@ -164,7 +164,7 @@ module.exports = class automator {
             log('Using chromeless driver');
             log(this.options.broker);
 
-            this.startChromelessSession().then(() => {
+            this.startYbChromelessSession().then(() => {
               this.processSteps(initNode, true).then((ret) => {
                 this.browser.end().then(() => resolve(ret), reject);
               }, reject);
