@@ -91,6 +91,7 @@ module.exports = class automator {
           this.browser = new YbChromeless({
             debug: true,
             implicitWait: true,
+            implicitMouseFocus: true,
             scrollBeforeClick: true,
             cdp: {
               host: this.options.broker.host,
