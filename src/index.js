@@ -93,6 +93,7 @@ module.exports = class automator {
             implicitWait: true,
             implicitMouseFocus: true,
             scrollBeforeClick: true,
+            launchChrome: false,
             cdp: {
               host: this.options.broker.host,
               port: session.port,
