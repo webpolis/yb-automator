@@ -95,7 +95,7 @@ module.exports = class automator {
             scrollBeforeClick: true,
             launchChrome: false,
             cdp: {
-              host: this.options.broker.host,
+              host: this.options.broker.host.replace(/:\d+$/, ''),
               port: session.port,
               secure: true,
               closeTab: false,
