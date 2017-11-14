@@ -36,7 +36,7 @@ module.exports = class automator {
               acceptSslCerts: true,
               platform: 'LINUX',
             },
-            logLevel: 'debug',
+            logLevel: 'error',
             host: this.options.webdriver.host,
             port: this.options.webdriver.port,
           });
