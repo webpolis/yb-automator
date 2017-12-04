@@ -272,6 +272,7 @@ module.exports = class automator {
             }).then(resolve, reject);
             break;
           default:
+            resolve();
             break;
         }
       }, reject);
