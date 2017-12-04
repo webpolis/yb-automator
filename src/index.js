@@ -20,6 +20,8 @@ module.exports = class automator {
           height: 768,
         },
       },
+      autoReport: true,
+      reportMethod: 'slack',
     }, options);
     this.options.driver = options.driver || automator.DRIVER_WEBDRIVERIO;
     this.errors = [];
@@ -143,20 +145,44 @@ module.exports = class automator {
 
                     log(`session ${this.options.sessionId} restored`);
 
-                    this.processSteps(initNode, true).then(resolve, reject);
+                    this.processSteps(initNode, true).then(resolve, (err) => {
+                      if (this.options.autoReport) {
+                        this.report();
+                      }
+
+                      reject(err);
+                    });
                   }, () => {
                     this.startWebdriverioSession().then(() => {
-                      this.processSteps(initNode, true).then(resolve, reject);
+                      this.processSteps(initNode, true).then(resolve, (err) => {
+                        if (this.options.autoReport) {
+                          this.report();
+                        }
+
+                        reject(err);
+                      });
                     });
                   });
                 } else {
                   this.startWebdriverioSession().then(() => {
-                    this.processSteps(initNode, true).then(resolve, reject);
+                    this.processSteps(initNode, true).then(resolve, (err) => {
+                      if (this.options.autoReport) {
+                        this.report();
+                      }
+
+                      reject(err);
+                    });
                   });
                 }
               } else {
                 this.startWebdriverioSession().then(() => {
-                  this.processSteps(initNode, true).then(resolve, reject);
+                  this.processSteps(initNode, true).then(resolve, (err) => {
+                    if (this.options.autoReport) {
+                      this.report();
+                    }
+
+                    reject(err);
+                  });
                 });
               }
             }, reject);
@@ -169,8 +195,20 @@ module.exports = class automator {
 
             this.startYbChromelessSession().then(() => {
               this.processSteps(initNode, true).then((ret) => {
-                this.browser.end().then(() => resolve(ret), reject);
-              }, reject);
+                this.browser.end().then(() => resolve(ret), (err) => {
+                  if (this.options.autoReport) {
+                    this.report();
+                  }
+
+                  reject(err);
+                });
+              }, (err) => {
+                if (this.options.autoReport) {
+                  this.report();
+                }
+
+                reject(err);
+              });
             });
             break;
           }
@@ -215,14 +253,14 @@ module.exports = class automator {
     return ret;
   }
 
-  report(platform = 'slack') {
+  report() {
     return new Promise((resolve, reject) => {
       this.screenshot().then((img) => {
         const imgName = Math.ceil(Math.random() * Date.now());
         const img64 = this.options.driver === automator.DRIVER_CHROMELESS ? img.value : `data:image/png;base64,${img.value}`;
         const imgPath = base64img.imgSync(img64, '/tmp', `${imgName}.png`);
 
-        switch (platform) {
+        switch (this.options.reportMethod) {
           case 'slack':
             slackReporter({
               filePath: imgPath,
@@ -276,12 +314,24 @@ module.exports = class automator {
 
               resolve();
             }, (err) => {
+              if (self.options.autoReport) {
+                self.report();
+              }
+
               reject({
                 error: Error(err),
               });
             });
           });
-        }).then(() => resolveFinal(stepsData), rejectFinal);
+        }).then(() => resolveFinal(stepsData), (err) => {
+          if (self.options.autoReport) {
+            self.report();
+          }
+
+          rejectFinal({
+            error: Error(err),
+          });
+        });
       }
 
       log(`running step "${step.name}"`);
@@ -292,7 +342,15 @@ module.exports = class automator {
         stepsData.steps[step.name] = data;
 
         resolveFinal(stepsData);
-      }, rejectFinal);
+      }, (err) => {
+        if (self.options.autoReport) {
+          self.report();
+        }
+
+        rejectFinal({
+          error: Error(err),
+        });
+      });
     });
   }
 };
