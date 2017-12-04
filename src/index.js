@@ -6,6 +6,7 @@ const YbChromeless = require('yb-chromeless').default;
 const request = require('request');
 const webdriverio = require('webdriverio');
 const base64img = require('base64-img');
+const slackReporter = require('./libs/slackReporter');
 
 const elog = debug('yb-automator:ERROR');
 const log = debug('yb-automator:LOG');
@@ -212,6 +213,29 @@ module.exports = class automator {
     }
 
     return ret;
+  }
+
+  report(platform = 'slack') {
+    return new Promise((resolve, reject) => {
+      this.screenshot().then((img) => {
+        const imgName = Math.ceil(Math.random() * Date.now());
+        const img64 = this.options.driver === automator.DRIVER_CHROMELESS ? img.value : `data:image/png;base64,${img.value}`;
+        const imgPath = base64img.imgSync(img64, '/tmp', `${imgName}.png`);
+
+        switch (platform) {
+          case 'slack':
+            slackReporter({
+              filePath: imgPath,
+              description: 'Automation has failed',
+              details: this.options.persona,
+            }, {
+              slack: this.options.slack,
+              aws: this.options.aws
+            }).then(resolve, reject);
+            break;
+        }
+      }, reject);
+    });
   }
 
   processSteps(step, isFirstStep) {

@@ -19,11 +19,15 @@
   "dependencies": {
     "base64-img": "^1.0.3",
     "bluebird": "^3.4.6",
-    "debug": "^2.6.3",
+    "debug": "^2.6.9",
     "gonitely-graph": "^0.0.1",
-    "lodash": "^4.17",
-    "request": "^2.75.0",
+    "lodash": "^4.17.4",
+    "request": "^2.83.0",
+    "s3": "^4.4.0",
     "webdriverio": "^4.6.2",
     "yb-chromeless": "^1.4.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.0.2"
   }
 }
