@@ -268,8 +268,10 @@ module.exports = class automator {
               details: this.options.persona,
             }, {
               slack: this.options.slack,
-              aws: this.options.aws
+              aws: this.options.aws,
             }).then(resolve, reject);
+            break;
+          default:
             break;
         }
       }, reject);
