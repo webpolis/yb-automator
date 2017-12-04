@@ -78,7 +78,7 @@ module.exports = function send(data, options) {
         ].join('\n');
 
         reportToSlack(text, {
-          webhookURL: options.slack.webhookURL
+          webhookURL: options.slack.webhookURL,
         }).then(resolve, reject);
       });
     } catch (err) {
