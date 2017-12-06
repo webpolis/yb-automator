@@ -264,7 +264,7 @@ module.exports = class automator {
           case 'slack':
             slackReporter({
               filePath: imgPath,
-              description: 'Automation has failed',
+              description: '_Automation has failed_',
               details: this.options.persona,
             }, {
               slack: this.options.slack,
@@ -317,20 +317,12 @@ module.exports = class automator {
 
               resolve();
             }, (err) => {
-              if (self.options.autoReport) {
-                self.report();
-              }
-
               reject({
                 error: Error(err),
               });
             });
           });
         }).then(() => resolveFinal(stepsData), (err) => {
-          if (self.options.autoReport) {
-            self.report();
-          }
-
           rejectFinal({
             error: Error(err),
           });
@@ -346,10 +338,6 @@ module.exports = class automator {
 
         resolveFinal(stepsData);
       }, (err) => {
-        if (self.options.autoReport) {
-          self.report();
-        }
-
         rejectFinal({
           error: Error(err),
         });
