@@ -145,44 +145,20 @@ module.exports = class automator {
 
                     log(`session ${this.options.sessionId} restored`);
 
-                    this.processSteps(initNode, true).then(resolve, (err) => {
-                      if (this.options.autoReport) {
-                        this.report();
-                      }
-
-                      reject(err);
-                    });
+                    this.processSteps(initNode, true).then(resolve, reject);
                   }, () => {
                     this.startWebdriverioSession().then(() => {
-                      this.processSteps(initNode, true).then(resolve, (err) => {
-                        if (this.options.autoReport) {
-                          this.report();
-                        }
-
-                        reject(err);
-                      });
+                      this.processSteps(initNode, true).then(resolve, reject);
                     });
                   });
                 } else {
                   this.startWebdriverioSession().then(() => {
-                    this.processSteps(initNode, true).then(resolve, (err) => {
-                      if (this.options.autoReport) {
-                        this.report();
-                      }
-
-                      reject(err);
-                    });
+                    this.processSteps(initNode, true).then(resolve, reject);
                   });
                 }
               } else {
                 this.startWebdriverioSession().then(() => {
-                  this.processSteps(initNode, true).then(resolve, (err) => {
-                    if (this.options.autoReport) {
-                      this.report();
-                    }
-
-                    reject(err);
-                  });
+                  this.processSteps(initNode, true).then(resolve, reject);
                 });
               }
             }, reject);
@@ -195,20 +171,8 @@ module.exports = class automator {
 
             this.startYbChromelessSession().then(() => {
               this.processSteps(initNode, true).then((ret) => {
-                this.browser.end().then(() => resolve(ret), (err) => {
-                  if (this.options.autoReport) {
-                    this.report();
-                  }
-
-                  reject(err);
-                });
-              }, (err) => {
-                if (this.options.autoReport) {
-                  this.report();
-                }
-
-                reject(err);
-              });
+                this.browser.end().then(() => resolve(ret), reject);
+              }, reject);
             });
             break;
           }
@@ -316,16 +280,14 @@ module.exports = class automator {
               stepsData.steps[nextStep.name] = data;
 
               resolve();
-            }, (err) => {
-              reject({
-                error: Error(err),
-              });
-            });
+            }, reject);
           });
         }).then(() => resolveFinal(stepsData), (err) => {
-          rejectFinal({
-            error: Error(err),
-          });
+          if (self.options.autoReport) {
+            self.report();
+          }
+
+          rejectFinal(err);
         });
       }
 
@@ -338,9 +300,11 @@ module.exports = class automator {
 
         resolveFinal(stepsData);
       }, (err) => {
-        rejectFinal({
-          error: Error(err),
-        });
+        if (self.options.autoReport) {
+          self.report();
+        }
+
+        rejectFinal(err);
       });
     });
   }
