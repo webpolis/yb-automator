@@ -270,7 +270,7 @@ module.exports = class automator {
     return ret;
   }
 
-  report() {
+  report(error = null) {
     return new Promise((resolve, reject) => {
       this.screenshot().then((img) => {
         const imgName = Math.ceil(Math.random() * Date.now());
@@ -281,7 +281,7 @@ module.exports = class automator {
           case 'slack':
             slackReporter({
               filePath: imgPath,
-              description: '_Automation has failed_',
+              description: error ? JSON.stringify(error) : '_Automation has failed_',
               details: this.options.persona,
             }, {
               slack: this.options.slack,
@@ -337,7 +337,7 @@ module.exports = class automator {
           });
         }).then(() => resolveFinal(stepsData), (err) => {
           if (self.options.autoReport) {
-            self.report();
+            self.report(err);
           }
 
           rejectFinal(err);
@@ -354,7 +354,7 @@ module.exports = class automator {
         resolveFinal(stepsData);
       }, (err) => {
         if (self.options.autoReport) {
-          self.report();
+          self.report(err);
         }
 
         rejectFinal(err);
