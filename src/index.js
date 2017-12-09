@@ -21,6 +21,7 @@ module.exports = class automator {
         },
       },
       autoReport: true,
+      resetWindow: true,
       reportMethod: 'slack',
     }, options);
     this.options.driver = options.driver || automator.DRIVER_WEBDRIVERIO;
@@ -171,7 +172,15 @@ module.exports = class automator {
 
             this.startYbChromelessSession().then(() => {
               this.processSteps(initNode, true).then((ret) => {
-                this.browser.end().then(() => resolve(ret), reject);
+                if (this.options.resetWindow) {
+                  this.resetWindow().then(() => this.browser.end().then(() => resolve(ret), reject), (err) => {
+                    elog(err);
+
+                    this.browser.end().then(() => resolve(ret), reject);
+                  });
+                } else {
+                  this.browser.end().then(() => resolve(ret), reject);
+                }
               }, reject);
             });
             break;
@@ -182,6 +191,50 @@ module.exports = class automator {
     });
   }
 
+  resetWindow() {
+    function rp(tab) {
+      return new Promise((_resolve, _reject) => {
+        request({
+          uri: `http://${this.options.broker.host}/close/${this.options.id}/${tab.id}`,
+          method: 'GET',
+        }, (_err) => {
+          if (_err) {
+            _reject(_err);
+          } else {
+            log(`tab ${tab.id} (${tab.url}) closed`);
+            _resolve(true);
+          }
+        });
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      let blank = 0;
+
+      request({
+        uri: `http://${this.options.broker.host}/tabs/${this.options.id}`,
+        method: 'GET',
+      }, (err, response, tabs) => {
+        if (err) {
+          reject(err);
+        } else {
+          const closeTabCalls = [];
+
+          if (tabs.length > 0) {
+            for (const tab of tabs) {
+              if (/about:blank/.test(tab.url)) {
+                blank++;
+              } else if (!/about:blank/.test(tab.url) || blank > 0) {
+                closeTabCalls.push(rp(tab));
+              }
+            }
+          }
+
+          Promise.all(closeTabCalls).then(resolve, reject);
+        }
+      });
+    });
+  }
   /**
    * screenshot - description
    *
