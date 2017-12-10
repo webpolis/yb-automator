@@ -192,10 +192,12 @@ module.exports = class automator {
   }
 
   resetWindow() {
+    const self = this;
+
     function rp(tab) {
       return new Promise((_resolve, _reject) => {
         request({
-          uri: `http://${this.options.broker.host}/close/${this.options.id}/${tab.id}`,
+          uri: `http://${self.options.broker.host}/close/${self.options.id}/${tab.id}`,
           method: 'GET',
         }, (_err) => {
           if (_err) {
