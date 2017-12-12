@@ -20,6 +20,9 @@ module.exports = class automator {
           height: 768,
         },
       },
+      headless: true,
+      incognito: false,
+      vnc: true,
       autoReport: true,
       resetWindow: true,
       reportMethod: 'slack',
@@ -81,6 +84,9 @@ module.exports = class automator {
         method: 'POST',
         json: {
           proxy: this.options.broker.proxy,
+          headless: this.options.headless ? 1 : 0,
+          incognito: this.options.incognito ? 1 : 0,
+          vnc: this.options.vnc ? 1 : 0,
         },
       }, (err, response, body) => {
         if (err) {
@@ -237,6 +243,7 @@ module.exports = class automator {
       });
     });
   }
+
   /**
    * screenshot - description
    *
