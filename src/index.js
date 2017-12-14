@@ -205,6 +205,7 @@ module.exports = class automator {
         request({
           uri: `http://${self.options.broker.host}/close/${self.options.id}/${tab.id}`,
           method: 'GET',
+          json: true,
         }, (_err) => {
           if (_err) {
             _reject(_err);
@@ -222,6 +223,7 @@ module.exports = class automator {
       request({
         uri: `http://${this.options.broker.host}/tabs/${this.options.id}`,
         method: 'GET',
+        json: true,
       }, (err, response, tabs) => {
         if (err) {
           reject(err);
