@@ -178,8 +178,16 @@ module.exports = class automator {
 
             this.startYbChromelessSession().then(() => {
               this.processSteps(initNode, true).then((ret) => {
+                log('steps completed');
+
                 if (this.options.resetWindow) {
-                  this.resetWindow().then(() => this.browser.end().then(() => resolve(ret), reject), (err) => {
+                  log('resetting window...');
+
+                  this.resetWindow().then(() => this.browser.end().then(() => {
+                    log('returning from automator...');
+
+                    resolve(ret);
+                  }, reject), (err) => {
                     elog(err);
 
                     this.browser.end().then(() => resolve(ret), reject);
@@ -341,12 +349,24 @@ module.exports = class automator {
             return Promise.promisify(nextStep.run, {
               multiArgs: false,
             }).call(self).then((data) => {
+              log(`[${path.name}] step "${nextStep.name}" finished`);
+
               stepsData.steps[nextStep.name] = data;
 
               resolve();
-            }, reject);
+            }, (err) => {
+              elog(`[${path.name}] step "${nextStep.name}" failed`);
+
+              reject(err);
+            });
           });
-        }).then(() => resolveFinal(stepsData), (err) => {
+        }).then(() => {
+          log('all steps were succesful');
+
+          resolveFinal(stepsData);
+        }, (err) => {
+          elog('one or more steps failed');
+
           if (self.options.autoReport) {
             self.report(err);
           }
