@@ -304,7 +304,7 @@ module.exports = class automator {
       this.screenshot().then((img) => {
         const imgName = Math.ceil(Math.random() * Date.now());
         const img64 = this.options.driver === automator.DRIVER_CHROMELESS ? img.value : `data:image/png;base64,${img.value}`;
-        const imgPath = base64img.imgSync(img64, '/tmp', `${imgName}.png`);
+        const imgPath = base64img.imgSync(img64, '/tmp', `${imgName}`);
 
         log('looking for report methods');
 
@@ -384,7 +384,7 @@ module.exports = class automator {
           if (self.options.autoReport) {
             log('auto report is enabled');
 
-            self.report(err);
+            self.report(err).then(() => log('report sent'), _err => elog(_err));
           } else {
             log('auto report is not enabled: ' + JSON.stringify(self.options));
           }
