@@ -299,13 +299,19 @@ module.exports = class automator {
 
   report(error = null) {
     return new Promise((resolve, reject) => {
+      log('taking screenshot');
+
       this.screenshot().then((img) => {
         const imgName = Math.ceil(Math.random() * Date.now());
         const img64 = this.options.driver === automator.DRIVER_CHROMELESS ? img.value : `data:image/png;base64,${img.value}`;
         const imgPath = base64img.imgSync(img64, '/tmp', `${imgName}.png`);
 
+        log('looking for report methods');
+
         switch (this.options.reportMethod) {
           case 'slack':
+            log('sending report via slack');
+
             slackReporter({
               filePath: imgPath,
               description: error ? JSON.stringify(error) : '_Automation has failed_',
@@ -376,7 +382,11 @@ module.exports = class automator {
           elog('one or more steps failed');
 
           if (self.options.autoReport) {
+            log('auto report is enabled');
+
             self.report(err);
+          } else {
+            log('auto report is not enabled: ' + JSON.stringify(self.options));
           }
 
           rejectFinal(err);
