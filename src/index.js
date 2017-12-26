@@ -197,14 +197,13 @@ module.exports = class automator {
                     });
                   }, (err) => {
                     elog(err);
-
-                    this.browser.end().then(() => resolve(ret), reject);
+                    this.browser.end().then(() => reject(err));
                   });
                 } else {
                   this.browser.end().then(() => resolve(ret), reject);
                 }
               }, reject);
-            });
+            }, reject);
             break;
           }
         default:
