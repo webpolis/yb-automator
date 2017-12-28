@@ -380,12 +380,16 @@ module.exports = class automator {
         }, (err) => {
           elog('one or more steps failed');
 
-          if (self.options.autoReport) {
-            log('auto report is enabled');
+          try {
+            if (self.options.autoReport) {
+              log('auto report is enabled');
 
-            self.report(err).then(() => log('report sent'), _err => elog(_err));
-          } else {
-            log('auto report is not enabled: ' + JSON.stringify(self.options));
+              self.report(err).then(() => log('report sent'), _err => elog(_err));
+            } else {
+              log('auto report is not enabled: ' + JSON.stringify(self.options));
+            }
+          } catch (_err) {
+            elog(_err);
           }
 
           rejectFinal(err);
