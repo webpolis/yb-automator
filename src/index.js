@@ -201,10 +201,15 @@ module.exports = class automator {
                     resolve(ret);
                   }, (err) => {
                     elog(err);
-                    this.browser.end().then(() => reject(err));
+
+                    this.browser.end();
+
+                    reject(err);
                   });
                 } else {
-                  this.browser.end().then(() => resolve(ret), reject);
+                  this.browser.end();
+
+                  resolve(ret);
                 }
               }, reject);
             }, reject);
