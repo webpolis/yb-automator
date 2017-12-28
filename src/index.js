@@ -186,15 +186,9 @@ module.exports = class automator {
                   this.resetWindow().then(() => {
                     log('closing browser session');
 
-                    this.browser.end().then(() => {
-                      log('returning from automator...');
+                    this.browser.end();
 
-                      resolve(ret);
-                    }, (err) => {
-                      elog('cannot close browser session');
-
-                      reject(err);
-                    });
+                    resolve(ret);
                   }, (err) => {
                     elog(err);
                     this.browser.end().then(() => reject(err));
