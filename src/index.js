@@ -177,6 +177,16 @@ module.exports = class automator {
             log(this.options.broker);
 
             this.startYbChromelessSession().then(() => {
+              this.browser.catch((err) => {
+                elog(err);
+
+                if (this.options.autoReport) {
+                  log('auto report is enabled');
+
+                  this.report(err).then(() => log('report sent'), _err => elog(_err));
+                }
+              });
+
               this.processSteps(initNode, true).then((ret) => {
                 log('steps completed');
 
@@ -384,6 +394,8 @@ module.exports = class automator {
             }
           } catch (_err) {
             elog(_err);
+
+            self.report(err).then(() => log('report sent'));
           }
 
           rejectFinal(err);
