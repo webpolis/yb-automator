@@ -183,7 +183,9 @@ module.exports = class automator {
                 if (this.options.autoReport) {
                   log('auto report is enabled');
 
-                  this.report(err).then(() => log('report sent'), _err => elog(_err));
+                  this.report(err).bind(err)
+                    .then(reject)
+                    .catch(reject);
                 }
               });
 
@@ -327,13 +329,22 @@ module.exports = class automator {
             }, {
               slack: this.options.slack,
               aws: this.options.aws,
-            }).then(resolve, reject);
+            }).then(resolve)
+                .catch((err) => {
+                  elog('there was a problem reporting to slack');
+                  elog(err);
+                  return reject(err);
+                });
             break;
           default:
             resolve();
             break;
         }
-      }, reject);
+      }).catch((err) => {
+        elog('there was a problem reporting the error');
+        elog(err);
+        return reject(err);
+      });
     });
   }
 
@@ -388,21 +399,21 @@ module.exports = class automator {
           resolveFinal(stepsData);
         }, (err) => {
           elog('one or more steps failed');
-
           try {
             if (self.options.autoReport) {
               log('auto report is enabled');
-
-              self.report(err).then(() => log('report sent'), _err => elog(_err));
+              self.report(err).bind(err)
+                .then(rejectFinal)
+                .catch(rejectFinal);
             } else {
               log('auto report is not enabled: ' + JSON.stringify(self.options));
             }
           } catch (_err) {
             elog(_err);
-
-            self.report(err).then(() => log('report sent'));
+            self.report(_err).bind(_err)
+              .then(rejectFinal)
+              .catch(rejectFinal);
           }
-
           rejectFinal(err);
         });
       }
@@ -417,9 +428,10 @@ module.exports = class automator {
         resolveFinal(stepsData);
       }, (err) => {
         if (self.options.autoReport) {
-          self.report(err);
+          self.report(err).bind(err)
+            .then(rejectFinal)
+            .catch(rejectFinal);
         }
-
         rejectFinal(err);
       });
     });
