@@ -1,6 +1,6 @@
 {
   "name": "yb-automator",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "Better Chrome automation",
   "main": "src/index.js",
   "scripts": {
