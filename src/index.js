@@ -28,7 +28,7 @@ module.exports = class automator {
       reportMethod: 'slack',
     }, options);
     this.options.driver = options.driver || automator.DRIVER_WEBDRIVERIO;
-    this.options.persona.message = this.options.persona.message.replace(/(\r\n|\n|\r)/gm, '\r\n');
+    this.options.persona.message = this.options.persona.message ? this.options.persona.message.replace(/(\r\n|\n|\r)/gm, '\r\n') : null;
     this.errors = [];
     this.graph = new Graph(this.options, {
       nodes: 'steps',
